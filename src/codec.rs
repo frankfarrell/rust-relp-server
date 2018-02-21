@@ -35,6 +35,8 @@ impl Decoder for RelpCodec {
             static ref RELP_PATTERN: Regex = Regex::new(r"^(?P<transactionNumber>\d{1,9}) (?P<command>[a-zA-Z]{1,32}) (?P<dataLen>\d{1,9})( (?P<data>.+))?").unwrap();
         }
 
+        //TODO Change this to least match on a version of regex above.
+        //Then split the buffer up to data length + headers length, if the frame is that long
         if let Some(i) = buf.iter().position(|&b| b == b'\n') {
             // remove the serialized frame from the buffer.
             let line = buf.split_to(i);
@@ -49,11 +51,13 @@ impl Decoder for RelpCodec {
                     io::stdout().flush().unwrap();
                     match RELP_PATTERN.is_match(s) {
                         true => {
-                            println!("It matches");
-                            io::stdout().flush().unwrap();
                             let caps = RELP_PATTERN.captures(s).unwrap();
+                            println!("It matches");
+
+                            let request_tx = caps.name("transactionNumber").unwrap().as_str().parse::<usize>().unwrap();
+
                             Ok(Some(RelpSyslogMessage {
-                                transaction_number: caps.name("transactionNumber").unwrap().as_str().parse::<usize>().unwrap(),
+                                transaction_number: request_tx,
                                 command: SyslogCommand::from_str(caps.name("command").unwrap().as_str()).unwrap(),
                                 data_length: caps.name("dataLen").unwrap().as_str().parse::<usize>().unwrap(),
                                 data: caps.name("data").map(|d| d.as_str().to_string()),
@@ -77,6 +81,9 @@ impl Encoder for RelpCodec {
     type Error = io::Error;
 
     fn encode(&mut self, relp_response: RelpResponse, buf: &mut BytesMut) -> io::Result<()> {
+
+        println!("In Decoder:{}", relp_response.transaction_number);
+        io::stdout().flush().unwrap();
 
         //Is this a good way to build a string?
         let response_string: String = [
