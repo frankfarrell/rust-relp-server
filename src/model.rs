@@ -21,6 +21,16 @@ impl FromStr for SyslogCommand {
 
 }
 
+impl ToString for SyslogCommand {
+    fn to_string(&self) -> String {
+        match *self {
+            SyslogCommand::Open => "Open".to_string(),
+            SyslogCommand::Syslog => "Syslog".to_string(),
+            SyslogCommand::Close => "Close".to_string()
+        }
+    }
+}
+
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum ResponseStatusCode {
     OK, ERROR

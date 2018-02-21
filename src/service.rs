@@ -39,10 +39,19 @@ impl Service for RelpService {
     // Produce a future for computing a response from a request.
     fn call(&self, request: Self::Request) -> Self::Future {
 
-        println!("Message:{}", request.transaction_number);
+        println!("Message tranaction number:{}", request.transaction_number);
+        println!("Message command:{:?}", request.command);
+        match request.data {
+            Some(ref p) => println!("Message data:{}", p),
+            None => println!("No message data"),
+        }
+        println!("Message data length:{}", request.data_length);
+
         io::stdout().flush().unwrap();
 
         if !self.is_connection_open.get() {
+            println!("Connection isn't open, opening connection");
+
             if request.command != SyslogCommand::Open {
                 Box::new(future::ok(RelpResponse{
                     transaction_number : 0,

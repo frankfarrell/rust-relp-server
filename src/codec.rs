@@ -63,8 +63,12 @@ impl Decoder for RelpCodec {
                                 data: caps.name("data").map(|d| d.as_str().to_string()),
                             }))
                         },
-                        false => Err(io::Error::new(io::ErrorKind::Other,
-                                                    "Not a valid RELP Frame"))
+                        false => {
+                            println!("Not a valid RELP frame");
+                            io::stdout().flush().unwrap();
+                            Err(io::Error::new(io::ErrorKind::Other,
+                                               "Not a valid RELP Frame"))
+                        }
                     }
                 }
                 Err(_) => Err(io::Error::new(io::ErrorKind::Other,
