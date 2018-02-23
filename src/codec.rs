@@ -120,7 +120,7 @@ mod tests {
     use model::{ResponseStatusCode,RelpResponse, RelpSyslogMessage, SyslogCommand};
 
     #[test]
-    fn it_decodes_message_correctly() {
+    fn it_decodes_open_message_correctly() {
         let mut relp_codec = RelpCodec::new();
         let buf = &mut BytesMut::new();
 
@@ -131,6 +131,21 @@ mod tests {
             command: SyslogCommand::Open,
             data_length: 15,
             data: Some("LOTS,OF,data123".to_string()),
+        }, relp_codec.decode(buf).unwrap().unwrap());
+    }
+
+    #[test]
+    fn it_decodes_syslog_message_correctly() {
+        let mut relp_codec = RelpCodec::new();
+        let buf = &mut BytesMut::new();
+
+        buf.put_slice(b"1 syslog 12 abcdefghijkl\n");
+
+        assert_eq!(RelpSyslogMessage{
+            transaction_number: 1,
+            command: SyslogCommand::Syslog,
+            data_length: 12,
+            data: Some("abcdefghijkl".to_string()),
         }, relp_codec.decode(buf).unwrap().unwrap());
     }
 
