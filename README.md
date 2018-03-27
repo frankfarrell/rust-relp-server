@@ -1,6 +1,6 @@
 # Rust RELP Server
 
-An implementation of the Reliable Event Logging Protocol (RELP) in Rust, [wikipedia article.](http://www.rsyslog.com/doc/relp.html)
+An implementation of the Reliable Event Logging Protocol (RELP) in Rust, [wikipedia article.](https://en.wikipedia.org/wiki/Reliable_Event_Logging_Protocol)
 
 The protocol is defined [here](http://www.rsyslog.com/doc/relp.html)
 
